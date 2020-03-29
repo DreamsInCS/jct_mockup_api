@@ -4,15 +4,8 @@ var express = require("express");
 var port = process.env.PORT || 5000;
 
 var app = express();
-    app.use(express.static(__dirname+ "/../"));
     app.get('/', (req, res) => {
         res.send("Yooooo!");
-    });
-    app.get('/someGetRequest', function(req, res, next) {
-       console.log('receiving get request');
-    });
-    app.post('/somePostRequest', function(req, res, next) {
-       console.log('receiving post request');
     });
     app.listen(80); //port 80 need to run as root
 
@@ -23,24 +16,15 @@ var server = http.createServer(app);
 
 console.log("http server listening on %d", port);
 
-var userId;
 var wss = new WebSocketServer({server: server, path: '/'});
     wss.on("connection", function (ws) {
+        console.info("websocket connection open");
 
-    console.info("websocket connection open");
-
-    var timestamp = new Date().getTime();
-    userId = timestamp;
-
-    // ws.send(JSON.stringify({msgType:"onOpenConnection", msg:{connectionId:timestamp}}));
-
-
-    ws.on("message", function (data, flags) {
-        console.log("websocket received a message");
-        var clientMsg = data;
-        
-        ws.send(JSON.stringify(data));
-        // ws.send(JSON.stringify({msg:{connectionId:userId}}));
+        ws.on("message", function (data, flags) {
+            console.log("websocket received a message");
+            
+            // Parse JSON to send original audio data back
+            ws.send(JSON.parse(data));
     });
 
     ws.on("close", function () {
